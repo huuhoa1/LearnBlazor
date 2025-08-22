@@ -1,7 +1,9 @@
 ﻿@page "/category/create"
 @page "/category/update/{id:int}"
+@rendermode InteractiveServer
 @inject ICategoryRepository _categoryRepository
 @inject NavigationManager _navigationManager
+@inject IJSRuntime _JS
 
 @if (IsProcessing)
 {
@@ -42,7 +44,7 @@ else
                         </div>
                     </div>
                 </div>
-            </EditForm>>
+            </EditForm>
 
         </div>
     </div>
@@ -56,25 +58,25 @@ else
     [SupplyParameterFromForm]
     private Category Category { get; set; } = new Category();
 
-    private bool IsProcessing { get; set; } = false;
+    private bool IsProcessing { get; set; } = true;
 
-    protected override async Task OnInitializedAsync()
-    {
-        IsProcessing = true;
-        await LoadCategory();
-        IsProcessing = false;
-    }
-
-    // protected override async Task OnAfterRenderAsync(bool firstRender)
+    // protected override async Task OnInitializedAsync()
     // {
-    //     if (firstRender)
-    //     {
-    //         await LoadCategory();
-    //         IsProcessing = false;
-    //         StateHasChanged();
-    //     }
-        // return base.OnAfterRenderAsync(firstRender);
+    //     IsProcessing = true;
+    //     await LoadCategory();
+    //     IsProcessing = false;
     // }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadCategory();
+            IsProcessing = false;
+            StateHasChanged();
+        }
+        // return base.OnAfterRenderAsync(firstRender);
+    }
 
     private async Task LoadCategory()
     {
@@ -91,11 +93,13 @@ else
         {
             //create
             await _categoryRepository.CreateAsync(Category);
+            await _JS.ToastrSuccess("Category Created Successfully");
         }
         else
         {
             //update
             await _categoryRepository.UpdateAsync(Category);
+            await _JS.ToastrSuccess("Category Updated Successfully");
         }
         IsProcessing = false;
         _navigationManager.NavigateTo("category");

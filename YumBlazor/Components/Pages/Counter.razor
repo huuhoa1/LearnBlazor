@@ -16,4 +16,11 @@
     {
         currentCount++;
     }
+
+    protected override void OnInitialized()
+    {
+        // Initialization logic if needed
+        Console.WriteLine("OnInitialized is called. CurrentCount is {currentCount}.");
+        base.OnInitialized();
+    }
 }
